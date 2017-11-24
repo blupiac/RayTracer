@@ -39,44 +39,28 @@ Hit Sphere::intersect(const Ray &ray)
     ****************************************************/
 
     // https://gamedev.stackexchange.com/questions/96459/fast-ray-sphere-collision-code
+    // http://www.r-5.org/files/books/computers/algo-list/realtime-3d/Christer_Ericson-Real-Time_Collision_Detection-EN.pdf
+    // section 5.3.2
 
-    // ray offset
-    Vector p = ray.O - position;
+    Vector m = ray.O - position; 
+    float b = m.dot(ray.D); 
+    float c = m.dot(m) - r * r; 
 
-    float r2 = r * r;
-    float pdotd = p.dot(ray.D);
+    // Exit if r’s origin outside s (c > 0) and r pointing away from s (b > 0) 
+    if (c > 0.0f && b > 0.0f) return Hit::NO_HIT(); 
+    float discr = b*b - c; 
 
-    // sphere behind or around starting point
-    if(pdotd > 0 || p.dot(p) < r2)
-        return Hit::NO_HIT();
+    // A negative discriminant corresponds to ray missing sphere 
+    if (discr < 0.0f) return Hit::NO_HIT(); 
 
-    // project p into the plane passing through the sphere center
-    Vector a = p - pdotd * ray.D;
+    // Ray now found to intersect sphere, compute smallest t value of intersection
+    float t = -b - sqrt(discr); 
 
-    float a2 = a.dot(a);
+    // If t is negative, ray started inside sphere so clamp t to zero 
+    if (t < 0.0f) t = 0.0f; 
+    //float q = p + t * d;
 
-    // approach outside sphere
-    if(a2 > r2)
-    {
-        return Hit::NO_HIT();
-    }
-
-    /****************************************************
-    * RT1.2: NORMAL CALCULATION
-    *
-    * Given: t, C, r
-    * Sought: N
-    * 
-    * Insert calculation of the sphere's normal at the intersection point.
-    ****************************************************/
-
-    // ray/plane dist
-    float t;// = sqrt(r2 - a2);
-
-    // intersection on center
-    //Vector i = a + t * ray.D;
-
-    Vector N;// = i / r;
+    Vector N;
 
     return Hit(t,N);
 }

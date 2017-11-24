@@ -56,10 +56,32 @@ Color Scene::trace(const Ray &ray)
     *        Color*Color        dito
     *        pow(a,b)           a to the power of b
     ****************************************************/
+    float shinyness = 1.0;
 
-    Color color = material->color;                  // place holder
+    Vector colorResponse = material->color;
+/*
+    for (std::vector<Light*>::iterator it = lights.begin() ; it != lights.end(); ++it)
+    {
+        Light* light = *it;
+        Vector lightResponse = light->color;
 
-    return color;
+        Vector wi = (hit - light->position);
+        Vector nwi = wi.normalized();
+                
+        Vector w0 = (V - hit);
+        Vector nw0 = w0.normalized();
+
+        Vector wiw0 = wi + w0;
+        Vector wh = (nwi + nw0) / wiw0.length();
+        Vector nwh = wh.normalized();
+
+        lightResponse *= N.dot(nwi);
+        lightResponse *= pow(N.dot(nwh), shinyness);
+
+        colorResponse += lightResponse;
+    }
+*/
+    return colorResponse;
 }
 
 void Scene::render(Image &img)
