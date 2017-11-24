@@ -38,7 +38,6 @@ Hit Sphere::intersect(const Ray &ray)
     * intersection point from the ray origin as t and the normal ad N (see example).
     ****************************************************/
 
-    // https://gamedev.stackexchange.com/questions/96459/fast-ray-sphere-collision-code
     // http://www.r-5.org/files/books/computers/algo-list/realtime-3d/Christer_Ericson-Real-Time_Collision_Detection-EN.pdf
     // section 5.3.2
 
@@ -58,9 +57,12 @@ Hit Sphere::intersect(const Ray &ray)
 
     // If t is negative, ray started inside sphere so clamp t to zero 
     if (t < 0.0f) t = 0.0f; 
-    //float q = p + t * d;
 
-    Vector N;
+    // https://gamedev.stackexchange.com/questions/96459/fast-ray-sphere-collision-code
+    Vector a = m - m.dot(ray.D) * ray.D;
+    Vector i = a - t * ray.D;
+
+    Vector N = i / r;
 
     return Hit(t,N);
 }
