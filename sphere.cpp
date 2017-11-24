@@ -38,13 +38,28 @@ Hit Sphere::intersect(const Ray &ray)
     * intersection point from the ray origin as t and the normal ad N (see example).
     ****************************************************/
 
-    // place holder for actual intersection calculation
+    // https://gamedev.stackexchange.com/questions/96459/fast-ray-sphere-collision-code
 
-    Vector OC = (position - ray.O).normalized();
-    if (OC.dot(ray.D) < 0.999) {
+    // ray offset
+    Vector p = ray.O - position;
+
+    float r2 = r * r;
+    float pdotd = p.dot(ray.D);
+
+    // sphere behind or around starting point
+    if(pdotd > 0 || p.dot(p) < r2)
+        return Hit::NO_HIT();
+
+    // project p into the plane passing through the sphere center
+    Vector a = p - pdotd * ray.D;
+
+    float a2 = a.dot(a);
+
+    // approach outside sphere
+    if(a2 > r2)
+    {
         return Hit::NO_HIT();
     }
-    double t = 1000;
 
     /****************************************************
     * RT1.2: NORMAL CALCULATION
@@ -55,7 +70,13 @@ Hit Sphere::intersect(const Ray &ray)
     * Insert calculation of the sphere's normal at the intersection point.
     ****************************************************/
 
-    Vector N /* = ... */;
+    // ray/plane dist
+    float t;// = sqrt(r2 - a2);
+
+    // intersection on center
+    //Vector i = a + t * ray.D;
+
+    Vector N;// = i / r;
 
     return Hit(t,N);
 }
