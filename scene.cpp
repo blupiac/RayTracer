@@ -56,9 +56,9 @@ Color Scene::trace(const Ray &ray)
     *        Color*Color        dito
     *        pow(a,b)           a to the power of b
     ****************************************************/
-    float spec = 2.0;
-    float diff = 2.0;
-    float shinyness = 3.0;
+    float spec = 0.5;
+    float diff = 0.5;
+    float shinyness = 30.0;
 
     // phong
     // https://en.wikipedia.org/wiki/Phong_reflection_model
@@ -75,10 +75,17 @@ Color Scene::trace(const Ray &ray)
         Vector rm = 2 * lm.dot(N) * N - lm;
         rm = rm.normalized();
 
-        //float lightIntensity = diff * lm.dot(N) + spec * pow(rm.dot(V) , shinyness);
-        float lightIntensity = N.dot(lm);
+        float difftIntensity = diff * lm.dot(N);
 
-        if(lightIntensity < 0)  lightIntensity = 0;
+        // otherwise, negatives will be turned into positive with pair powers
+        if(rm.dot(V) < 0)  rm = Vector(0 , 0 , 0);
+
+        float specIntensity = spec * pow(rm.dot(V) , shinyness);
+
+        if(difftIntensity < 0)  difftIntensity = 0;
+        if(specIntensity < 0)  specIntensity = 0;
+
+        float lightIntensity = difftIntensity + specIntensity;
 
         intensity += lightIntensity;
     }
