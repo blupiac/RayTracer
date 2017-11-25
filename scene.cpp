@@ -56,32 +56,36 @@ Color Scene::trace(const Ray &ray)
     *        Color*Color        dito
     *        pow(a,b)           a to the power of b
     ****************************************************/
-    float shinyness = 1.0;
+    float spec = 2.0;
+    float diff = 2.0;
+    float shinyness = 3.0;
 
-    Vector colorResponse = material->color;
-/*
+    // phong
+    // https://en.wikipedia.org/wiki/Phong_reflection_model
+
+    Vector intensity = Vector(0 , 0 , 0);
+
     for (std::vector<Light*>::iterator it = lights.begin() ; it != lights.end(); ++it)
     {
         Light* light = *it;
-        Vector lightResponse = light->color;
+        
+        Vector lm = light->position - hit;
+        lm = lm.normalized();
 
-        Vector wi = (hit - light->position);
-        Vector nwi = wi.normalized();
-                
-        Vector w0 = (V - hit);
-        Vector nw0 = w0.normalized();
+        Vector rm = 2 * lm.dot(N) * N - lm;
+        rm = rm.normalized();
 
-        Vector wiw0 = wi + w0;
-        Vector wh = (nwi + nw0) / wiw0.length();
-        Vector nwh = wh.normalized();
+        //float lightIntensity = diff * lm.dot(N) + spec * pow(rm.dot(V) , shinyness);
+        float lightIntensity = N.dot(lm);
 
-        lightResponse *= N.dot(nwi);
-        lightResponse *= pow(N.dot(nwh), shinyness);
+        if(lightIntensity < 0)  lightIntensity = 0;
 
-        colorResponse += lightResponse;
+        intensity += lightIntensity;
     }
-*/
-    return colorResponse;
+    
+    Color color = material->color * intensity;
+
+    return color;
 }
 
 void Scene::render(Image &img)

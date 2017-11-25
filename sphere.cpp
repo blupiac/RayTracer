@@ -58,11 +58,10 @@ Hit Sphere::intersect(const Ray &ray)
     // If t is negative, ray started inside sphere so clamp t to zero 
     if (t < 0.0f) t = 0.0f; 
 
-    // https://gamedev.stackexchange.com/questions/96459/fast-ray-sphere-collision-code
-    Vector a = m - m.dot(ray.D) * ray.D;
-    Vector i = a - t * ray.D;
+    Vector i = ray.O + t * ray.D;
 
-    Vector N = i / r;
+    Vector N = i - position;
+    N = N.normalized();
 
     return Hit(t,N);
 }
