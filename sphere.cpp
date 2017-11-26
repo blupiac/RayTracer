@@ -8,6 +8,7 @@
 //  Authors:
 //    Maarten Everts
 //    Jasper van de Gronde
+//    Bernard Lupiac
 //
 //  This framework is inspired by and uses code of the raytracer framework of 
 //  Bert Freudenberg that can be found at
