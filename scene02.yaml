@@ -1,6 +1,8 @@
 ---
 #  scene02
 
+Mode: "normal"
+
 Eye: [200,200,1000]  
 
 Lights:

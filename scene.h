@@ -29,9 +29,16 @@ private:
     std::vector<Object*> objects;
     std::vector<Light*> lights;
     Triple eye;
+
+    float spec = 0.5;
+    float diff = 0.5;
+    float shinyness = 30.0;
+
 public:
     Color trace(const Ray &ray);
     void render(Image &img);
+    void renderZBuffer(Image &img);
+    void renderNBuffer(Image &img);
     void addObject(Object *o);
     void addLight(Light *l);
     void setEye(Triple e);

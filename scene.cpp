@@ -57,9 +57,6 @@ Color Scene::trace(const Ray &ray)
     *        Color*Color        dito
     *        pow(a,b)           a to the power of b
     ****************************************************/
-    float spec = 0.5;
-    float diff = 0.5;
-    float shinyness = 30.0;
 
     // phong
     // https://en.wikipedia.org/wiki/Phong_reflection_model
@@ -73,10 +70,11 @@ Color Scene::trace(const Ray &ray)
         Vector lm = light->position - hit;
         lm = lm.normalized();
 
-        Vector rm = 2 * lm.dot(N) * N - lm;
+        float lmDotN = lm.dot(N);
+        Vector rm = 2 * lmDotN * N - lm;
         rm = rm.normalized();
 
-        float difftIntensity = diff * lm.dot(N);
+        float difftIntensity = diff * lmDotN;
 
         // otherwise, negatives will be turned into positive with pair powers
         if(rm.dot(V) < 0)  rm = Vector(0 , 0 , 0);
@@ -97,6 +95,36 @@ Color Scene::trace(const Ray &ray)
 }
 
 void Scene::render(Image &img)
+{
+    int w = img.width();
+    int h = img.height();
+    for (int y = 0; y < h; y++) {
+        for (int x = 0; x < w; x++) {
+            Point pixel(x+0.5, h-1-y+0.5, 0);
+            Ray ray(eye, (pixel-eye).normalized());
+            Color col = trace(ray);
+            col.clamp();
+            img(x,y) = col;
+        }
+    }
+}
+
+void Scene::renderZBuffer(Image &img)
+{
+    int w = img.width();
+    int h = img.height();
+    for (int y = 0; y < h; y++) {
+        for (int x = 0; x < w; x++) {
+            Point pixel(x+0.5, h-1-y+0.5, 0);
+            Ray ray(eye, (pixel-eye).normalized());
+            Color col = trace(ray);
+            col.clamp();
+            img(x,y) = col;
+        }
+    }
+}
+
+void Scene::renderNBuffer(Image &img)
 {
     int w = img.width();
     int h = img.height();

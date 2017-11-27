@@ -108,6 +108,8 @@ bool Raytracer::readScene(const std::string& inputFilename)
             YAML::Node doc;
             parser.GetNextDocument(doc);
 
+            doc["Mode"] >> mode;
+
             // Read scene configuration options
             scene->setEye(parseTriple(doc["Eye"]));
 
@@ -153,7 +155,18 @@ void Raytracer::renderToFile(const std::string& outputFilename)
 {
     Image img(400,400);
     cout << "Tracing..." << endl;
-    scene->render(img);
+    if(mode == "normal")
+    {
+    	scene->render(img);
+    }
+    else if(mode == "zbuffer")
+    {
+    	scene->renderZBuffer(img);
+    }
+    else if(mode == "nbuffer")
+    {
+    	scene->renderNBuffer(img);
+    }
     cout << "Writing image to " << outputFilename << "..." << endl;
     img.write_png(outputFilename.c_str());
     cout << "Done." << endl;
