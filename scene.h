@@ -35,7 +35,7 @@ private:
     float shinyness = 30.0;
 
 public:
-    Color trace(const Ray &ray);
+    Color trace(const Ray &ray, unsigned int mode);
     void render(Image &img);
     void renderZBuffer(Image &img);
     void renderNBuffer(Image &img);

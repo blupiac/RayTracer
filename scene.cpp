@@ -18,7 +18,7 @@
 #include "scene.h"
 #include "material.h"
 
-Color Scene::trace(const Ray &ray)
+Color Scene::trace(const Ray &ray, unsigned int mode)
 {
     // Find hit object and distance
     Hit min_hit(std::numeric_limits<double>::infinity(),Vector());
@@ -34,29 +34,18 @@ Color Scene::trace(const Ray &ray)
     // No hit? Return background color.
     if (!obj) return Color(0.0, 0.0, 0.0);
 
+    if(mode == 1) // zbuffer
+    {
+        std::cout << min_hit.t << std::endl;
+        // min dist = 100, max dist = 10000
+        float dist = (100 - min_hit.t) / (1000 - 100);
+        return Vector(dist, dist, dist);
+    }
+
     Material *material = obj->material;            //the hit objects material
     Point hit = ray.at(min_hit.t);                 //the hit point
     Vector N = min_hit.N;                          //the normal at hit point
     Vector V = -ray.D;                             //the view vector
-
-
-    /****************************************************
-    * This is where you should insert the color
-    * calculation (Phong model).
-    *
-    * Given: material, hit, N, V, lights[]
-    * Sought: color
-    *
-    * Hints: (see triple.h)
-    *        Triple.dot(Vector) dot product
-    *        Vector+Vector      vector sum
-    *        Vector-Vector      vector difference
-    *        Point-Point        yields vector
-    *        Vector.normalize() normalizes vector, returns length
-    *        double*Color        scales each color component (r,g,b)
-    *        Color*Color        dito
-    *        pow(a,b)           a to the power of b
-    ****************************************************/
 
     // phong
     // https://en.wikipedia.org/wiki/Phong_reflection_model
@@ -102,7 +91,7 @@ void Scene::render(Image &img)
         for (int x = 0; x < w; x++) {
             Point pixel(x+0.5, h-1-y+0.5, 0);
             Ray ray(eye, (pixel-eye).normalized());
-            Color col = trace(ray);
+            Color col = trace(ray, 0);
             col.clamp();
             img(x,y) = col;
         }
@@ -117,7 +106,7 @@ void Scene::renderZBuffer(Image &img)
         for (int x = 0; x < w; x++) {
             Point pixel(x+0.5, h-1-y+0.5, 0);
             Ray ray(eye, (pixel-eye).normalized());
-            Color col = trace(ray);
+            Color col = trace(ray, 1);
             col.clamp();
             img(x,y) = col;
         }
@@ -132,7 +121,7 @@ void Scene::renderNBuffer(Image &img)
         for (int x = 0; x < w; x++) {
             Point pixel(x+0.5, h-1-y+0.5, 0);
             Ray ray(eye, (pixel-eye).normalized());
-            Color col = trace(ray);
+            Color col = trace(ray, 2);
             col.clamp();
             img(x,y) = col;
         }
