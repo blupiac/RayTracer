@@ -155,7 +155,7 @@ void Raytracer::renderToFile(const std::string& outputFilename)
 {
     Image img(400,400);
     cout << "Tracing..." << endl;
-    if(mode == "normal")
+    if(mode == "pbr")
     {
     	scene->render(img);
     }
@@ -163,7 +163,7 @@ void Raytracer::renderToFile(const std::string& outputFilename)
     {
     	scene->renderZBuffer(img);
     }
-    else if(mode == "nbuffer")
+    else if(mode == "normal")
     {
     	scene->renderNBuffer(img);
     }

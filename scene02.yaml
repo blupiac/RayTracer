@@ -1,7 +1,7 @@
 ---
 #  scene02
 
-Mode: "zbuffer"
+Mode: "normal"
 
 Eye: [200,200,1000]  
 

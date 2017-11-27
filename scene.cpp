@@ -36,10 +36,14 @@ Color Scene::trace(const Ray &ray, unsigned int mode)
 
     if(mode == 1) // zbuffer
     {
-        std::cout << min_hit.t << std::endl;
-        // min dist = 100, max dist = 10000
-        float dist = (100 - min_hit.t) / (1000 - 100);
+        // simple normalization using min dist = 100, max dist = 10000
+        float dist = (10 - min_hit.t) / (1000 - 10);
         return Vector(dist, dist, dist);
+    }
+    else if(mode == 2) // nbuffer
+    {
+        // simple normalization again
+        return Vector((min_hit.N.x+1)/2, (min_hit.N.y+1)/2, (min_hit.N.z+1)/2);
     }
 
     Material *material = obj->material;            //the hit objects material
