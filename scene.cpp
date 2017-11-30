@@ -67,12 +67,12 @@ Color Scene::trace(const Ray &ray, unsigned int mode)
         Vector rm = 2 * lmDotN * N - lm;
         rm = rm.normalized();
 
-        float difftIntensity = diff * lmDotN;
+        float difftIntensity = material->kd * lmDotN;
 
         // otherwise, negatives will be turned into positive with pair powers
         if(rm.dot(V) < 0)  rm = Vector(0 , 0 , 0);
 
-        float specIntensity = spec * pow(rm.dot(V) , shinyness);
+        float specIntensity = material->ks * pow(rm.dot(V) , material->n);
 
         if(difftIntensity < 0)  difftIntensity = 0;
         if(specIntensity < 0)  specIntensity = 0;

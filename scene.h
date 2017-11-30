@@ -30,10 +30,6 @@ private:
     std::vector<Light*> lights;
     Triple eye;
 
-    float spec = 0.5;
-    float diff = 0.5;
-    float shinyness = 30.0;
-
 public:
     Color trace(const Ray &ray, unsigned int mode);
     void render(Image &img);

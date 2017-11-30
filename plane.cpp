@@ -28,11 +28,8 @@ Hit Plane::intersect(const Ray &ray)
 
     float t = (d - n.dot(ray.O)) / n.dot(ray.D);
 
-    std::cout << t << " " << n.dot(ray.O) << " " << n.dot(ray.D) << std::endl;
-
     if(t >= 0)
     {
-        std::cout << "plane hit" << std::endl;
         return Hit(t, n);
     }
 
