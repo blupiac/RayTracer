@@ -15,20 +15,20 @@
 //  http://isgwww.cs.uni-magdeburg.de/graphik/lehre/cg2/projekt/rtprojekt.html 
 //
 
-#ifndef BOX_H
-#define BOX_H
+#ifndef PLANE_H
+#define PLANE_H
 
 #include "object.h"
 
-class Box : public Object
+class Plane : public Object
 {
 public:
-    Box(Point ll, Point ur) : ll(ll), ur(ur) { }
+    Plane(float d, Vector n) : d(d), n(n) { }
 
     virtual Hit intersect(const Ray &ray);
 
-    // lower left front, upper right back
-    const Point ll, ur;
+    const float d;
+    const Vector n;
 };
 
 #endif /* end of include guard: TRIANGLE_H */
