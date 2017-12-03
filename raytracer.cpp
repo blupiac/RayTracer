@@ -128,7 +128,7 @@ bool Raytracer::readScene(const std::string& inputFilename)
             YAML::Node doc;
             parser.GetNextDocument(doc);
 
-            doc["Mode"] >> mode;
+            doc["RenderMode"] >> mode;
 
             // Read scene configuration options
             scene->setEye(parseTriple(doc["Eye"]));
@@ -175,7 +175,7 @@ void Raytracer::renderToFile(const std::string& outputFilename)
 {
     Image img(400,400);
     cout << "Tracing..." << endl;
-    if(mode == "pbr")
+    if(mode == "phong")
     {
     	scene->render(img);
     }

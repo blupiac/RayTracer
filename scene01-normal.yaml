@@ -12,7 +12,7 @@
 #  The example scene description should largely speak for itself. By now
 #  it should be clear that the #-character can be used to insert comments.
 
-RenderMode: "phong"
+RenderMode: "normal"
 
 Eye: [200,200,1000]  
 
@@ -62,25 +62,6 @@ Objects:
   radius: 50
   material: # orange
     color: [1.0,0.5,0.0]
-    ka: 0.2
-    kd: 0.8
-    ks: 0.5
-    n: 32
-- type: triangle
-  a: [200, 200, 200]
-  b: [250, 200, 300]
-  c: [200, 250, 200]
-  material: # orange
-    color: [1.0,0.5,0.0]
-    ka: 0.2
-    kd: 0.8
-    ks: 0.5
-    n: 32
-- type: plane
-  n: [0, 1, 0]
-  d: 150
-  material:
-    color: [0.0,0.7,1.0]
     ka: 0.2
     kd: 0.8
     ks: 0.5
