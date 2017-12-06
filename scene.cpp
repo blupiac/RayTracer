@@ -77,7 +77,7 @@ Color Scene::trace(const Ray &ray, unsigned int mode, bool shadows)
         if(difftIntensity < 0)  difftIntensity = 0;
         if(specIntensity < 0)  specIntensity = 0;
 
-        float lightIntensity = difftIntensity + specIntensity;
+        Triple lightIntensity = light->color * (difftIntensity + specIntensity);
 
         if(shadows)
         {
