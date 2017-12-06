@@ -31,10 +31,10 @@ private:
     Triple eye;
 
 public:
-    Color trace(const Ray &ray, unsigned int mode);
-    void render(Image &img);
-    void renderZBuffer(Image &img);
-    void renderNBuffer(Image &img);
+    Color trace(const Ray &ray, unsigned int mode, bool shadows);
+    void render(Image &img, bool shadows);
+    void renderZBuffer(Image &img, bool shadows);
+    void renderNBuffer(Image &img, bool shadows);
     void addObject(Object *o);
     void addLight(Light *l);
     void setEye(Triple e);

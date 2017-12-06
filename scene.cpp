@@ -18,7 +18,7 @@
 #include "scene.h"
 #include "material.h"
 
-Color Scene::trace(const Ray &ray, unsigned int mode)
+Color Scene::trace(const Ray &ray, unsigned int mode, bool shadows)
 {
     // Find hit object and distance
     Hit min_hit(std::numeric_limits<double>::infinity(),Vector());
@@ -59,7 +59,7 @@ Color Scene::trace(const Ray &ray, unsigned int mode)
     for (std::vector<Light*>::iterator it = lights.begin() ; it != lights.end(); ++it)
     {
         Light* light = *it;
-        
+
         Vector lm = light->position - hit;
         lm = lm.normalized();
 
@@ -79,6 +79,26 @@ Color Scene::trace(const Ray &ray, unsigned int mode)
 
         float lightIntensity = difftIntensity + specIntensity;
 
+        if(shadows)
+        {
+            bool shadowed = false;
+            unsigned int i = 0;
+            Ray lightRay(hit, (light->position - hit).normalized());
+            while (!shadowed && i < objects.size()) 
+            {
+                Hit hit(objects[i]->intersect(lightRay));
+                if (hit.no_hit == false && objects[i] != obj) 
+                {
+                    shadowed = true;
+                }
+                i++;
+            }
+            if(shadowed == true)
+            {
+                lightIntensity *= 0.2;
+            }
+        }
+
         intensity += lightIntensity;
     }
     
@@ -87,7 +107,7 @@ Color Scene::trace(const Ray &ray, unsigned int mode)
     return color;
 }
 
-void Scene::render(Image &img)
+void Scene::render(Image &img, bool shadows)
 {
     int w = img.width();
     int h = img.height();
@@ -95,14 +115,14 @@ void Scene::render(Image &img)
         for (int x = 0; x < w; x++) {
             Point pixel(x+0.5, h-1-y+0.5, 0);
             Ray ray(eye, (pixel-eye).normalized());
-            Color col = trace(ray, 0);
+            Color col = trace(ray, 0, shadows);
             col.clamp();
             img(x,y) = col;
         }
     }
 }
 
-void Scene::renderZBuffer(Image &img)
+void Scene::renderZBuffer(Image &img, bool shadows)
 {
     int w = img.width();
     int h = img.height();
@@ -110,14 +130,14 @@ void Scene::renderZBuffer(Image &img)
         for (int x = 0; x < w; x++) {
             Point pixel(x+0.5, h-1-y+0.5, 0);
             Ray ray(eye, (pixel-eye).normalized());
-            Color col = trace(ray, 1);
+            Color col = trace(ray, 1, shadows);
             col.clamp();
             img(x,y) = col;
         }
     }
 }
 
-void Scene::renderNBuffer(Image &img)
+void Scene::renderNBuffer(Image &img, bool shadows)
 {
     int w = img.width();
     int h = img.height();
@@ -125,7 +145,7 @@ void Scene::renderNBuffer(Image &img)
         for (int x = 0; x < w; x++) {
             Point pixel(x+0.5, h-1-y+0.5, 0);
             Ray ray(eye, (pixel-eye).normalized());
-            Color col = trace(ray, 2);
+            Color col = trace(ray, 2, shadows);
             col.clamp();
             img(x,y) = col;
         }
