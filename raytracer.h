@@ -26,7 +26,7 @@ class Raytracer {
 private:
     Scene *scene;
     std::string mode;
-    bool shadows;
+    bool shadows, reflections;
 
     // Couple of private functions for parsing YAML nodes
     Material* parseMaterial(const YAML::Node& node);

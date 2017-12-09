@@ -29,10 +29,13 @@ private:
     std::vector<Object*> objects;
     std::vector<Light*> lights;
     Triple eye;
+    Color recursiveReflection(Ray ray, unsigned int depth, unsigned int maxDepth);
+    Color totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights, Object *obj, bool shadows, bool reflection);
+    void phong(Point hit, Point lightPosition, Vector N, Vector V, Material *mat, float &difftIntensity, float &specIntensity);
 
 public:
-    Color trace(const Ray &ray, unsigned int mode, bool shadows);
-    void render(Image &img, bool shadows);
+    Color trace(const Ray &ray, unsigned int mode, bool shadows, bool reflection);
+    void render(Image &img, bool shadows, bool reflection);
     void renderZBuffer(Image &img, bool shadows);
     void renderNBuffer(Image &img, bool shadows);
     void addObject(Object *o);

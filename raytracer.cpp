@@ -132,6 +132,9 @@ bool Raytracer::readScene(const std::string& inputFilename)
             if(doc["Shadows"] == "true")    shadows = true;
             else                            shadows = false;
 
+            if(doc["Reflections"] == "true")     reflections = true;
+            else                                reflections = false;
+
             // Read scene configuration options
             scene->setEye(parseTriple(doc["Eye"]));
 
@@ -179,7 +182,7 @@ void Raytracer::renderToFile(const std::string& outputFilename)
     cout << "Tracing..." << endl;
     if(mode == "phong")
     {
-    	scene->render(img, shadows);
+    	scene->render(img, shadows, reflections);
     }
     else if(mode == "zbuffer")
     {
