@@ -67,15 +67,20 @@ Color Scene::totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights,
 
         phong(hit, light->position, N, V, material, difftIntensity, specIntensity);
 
+        //if(!reflection) std::cout << "spec: " << specIntensity << std::endl;
+
         Triple lightIntensity;
 
         // https://math.stackexchange.com/questions/13261/how-to-get-a-reflection-vector
         if(reflection)
         {
             Point thisIntersectpoint;
-            Ray reflectRay(hit , ray.D - 2 * (ray.D.dot(min_hit.N) * min_hit.N));
+            Vector dir = ray.D - 2 * (ray.D.dot(min_hit.N) * min_hit.N);
+            Ray reflectRay(hit + 0.001 * dir, dir);
+            reflectRay.D = reflectRay.D.normalized();
             Color specCol = recursiveReflection(reflectRay, 1, 2, shadows, thisIntersectpoint);
-            lightIntensity = light->color * difftIntensity + specCol * specIntensity;
+            //std::cout << specCol << " " << specIntensity << std::endl;
+            lightIntensity = light->color * (difftIntensity) + specCol * specIntensity;
         }
         else
         {
@@ -121,12 +126,16 @@ void Scene::phong(Point hit, Point lightPosition, Vector N, Vector V, Material *
     Vector rm = 2 * lmDotN * N - lm;
     rm = rm.normalized();
 
+    //std::cout << "rm: " << rm << "\t\tlmDotN: " << lmDotN << "\t\tN: " << N << "\t\tlm: " << lm << std::endl;
+
     difftIntensity = mat->kd * lmDotN;
 
     // otherwise, negatives will be turned into positive with pair exponents
-    if(rm.dot(V) < 0)  rm = Vector(0 , 0 , 0);
+    //if(rm.dot(V) < 0)  rm = Vector(0 , 0 , 0);
 
     specIntensity = mat->ks * pow(rm.dot(V) , mat->n);
+
+    std::cout << "spec: " << specIntensity << " ks: " << mat->ks << " n: " << mat->n << " rm: " << rm << " V: " << V << std::endl;
 
     if(difftIntensity < 0)  difftIntensity = 0;
     if(specIntensity < 0)  specIntensity = 0;
@@ -153,19 +162,25 @@ Color Scene::recursiveReflection(Ray ray, unsigned int depth, unsigned int maxDe
 
     if(depth == maxDepth)
     {
-        totalColor(ray, min_hit, lights, obj, shadows, false, difftIntensity, specIntensity);
-        return obj->material->color * specIntensity;
+        Color col = totalColor(ray, min_hit, lights, obj, shadows, false, difftIntensity, specIntensity);
+        //std::cout << "depth: " << depth << " col: " << col << " spec: " << specIntensity << std::endl;
+        return col * specIntensity;
     }
     else
     {
         // https://math.stackexchange.com/questions/13261/how-to-get-a-reflection-vector
         Point thisIntersectpoint;
-        Ray reflectRay(intersectpoint , ray.D - 2 * (ray.D.dot(min_hit.N) * min_hit.N));
+        Vector dir = ray.D - 2 * (ray.D.dot(min_hit.N) * min_hit.N);
+        Ray reflectRay(intersectpoint + 0.001 * dir, dir);
+        reflectRay.D = reflectRay.D.normalized();
         Color lightCol = recursiveReflection(reflectRay, depth + 1, maxDepth, shadows, thisIntersectpoint);
+        //std::cout << "interPoint: " << thisIntersectpoint << " lightCol: " << lightCol << std::endl;
         Light reflLight(thisIntersectpoint, lightCol);
         lights.push_back(&reflLight);
-        Color resCol = totalColor(ray, min_hit, lights, obj, shadows, false, difftIntensity, specIntensity);;
+        Color resCol = totalColor(ray, min_hit, lights, obj, shadows, false, difftIntensity, specIntensity);
+        resCol *= specIntensity;
         lights.pop_back();
+        //std::cout << "depth: " << depth << " col: " << lightCol << " spec: " << specIntensity << std::endl;
         return resCol;
     }
 }
