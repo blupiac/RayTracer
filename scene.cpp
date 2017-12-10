@@ -46,10 +46,12 @@ Color Scene::trace(const Ray &ray, unsigned int mode, bool shadows, bool reflect
         return Vector((min_hit.N.x+1)/2, (min_hit.N.y+1)/2, (min_hit.N.z+1)/2);
     }
 
-    return totalColor(ray, min_hit, lights, obj, shadows, reflection);
+    float difftIntensity, specIntensity;
+
+    return totalColor(ray, min_hit, lights, obj, shadows, reflection, difftIntensity, specIntensity);
 }
 
-Color Scene::totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights, Object *obj, bool shadows, bool reflection)
+Color Scene::totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights, Object *obj, bool shadows, bool reflection, float &difftIntensity, float &specIntensity)
 {
 
     Material *material = obj->material;            //the hit objects material
@@ -58,18 +60,23 @@ Color Scene::totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights,
     Vector V = -ray.D;                             //the view vector
 
 
+    // https://math.stackexchange.com/questions/13261/how-to-get-a-reflection-vector
+    if(reflection)
+    {
+        Point thisIntersectpoint;
+        Ray reflectRay(hit , ray.D - 2 * (ray.D.dot(min_hit.N) * min_hit.N));
+        Color lightCol = recursiveReflection(reflectRay, 1, 2, shadows, thisIntersectpoint);
+        Light reflLight(thisIntersectpoint, lightCol);
+        //lights.push_back(&reflLight);
+    }
+
     Vector intensity = Vector(0 , 0 , 0);
 
     for (std::vector<Light*>::iterator it = lights.begin() ; it != lights.end(); ++it)
     {
         Light* light = *it;
 
-        float difftIntensity, specIntensity;
         phong(hit, light->position, N, V, material, difftIntensity, specIntensity);
-
-        // https://math.stackexchange.com/questions/13261/how-to-get-a-reflection-vector
-        Ray reflectRay(hit , ray.D - 2 * (ray.D.dot(min_hit.N) * min_hit.N));
-        //Color reflectionColor(recursiveReflection(reflectRay, 1, 2));
 
         Triple lightIntensity = light->color * (difftIntensity + specIntensity);
 
@@ -123,7 +130,7 @@ void Scene::phong(Point hit, Point lightPosition, Vector N, Vector V, Material *
     if(specIntensity < 0)  specIntensity = 0;
 }
 
-Color Scene::recursiveReflection(Ray ray, unsigned int depth, unsigned int maxDepth)
+Color Scene::recursiveReflection(Ray ray, unsigned int depth, unsigned int maxDepth, bool shadows, Point &intersectpoint)
 {
     // Find hit object and distance
     Hit min_hit(std::numeric_limits<double>::infinity(),Vector());
@@ -136,17 +143,28 @@ Color Scene::recursiveReflection(Ray ray, unsigned int depth, unsigned int maxDe
         }
     }
 
-    if(min_hit.no_hit)  return Color(0, 0, 0);
+    // No hit? Return background color.
+    if (!obj) return Color(0.0, 0.0, 0.0);
+
+    intersectpoint = ray.at(min_hit.t);
+    float difftIntensity, specIntensity;
 
     if(depth == maxDepth)
     {
-        return obj->material->color * obj->material->ks;
+        totalColor(ray, min_hit, lights, obj, shadows, false, difftIntensity, specIntensity);
+        return obj->material->color * specIntensity;
     }
     else
     {
         // https://math.stackexchange.com/questions/13261/how-to-get-a-reflection-vector
-        Ray reflectRay(ray.at(min_hit.t) , ray.D - 2 * (ray.D.dot(min_hit.N) * min_hit.N));
-        //return (obj->material->color + recursiveReflection(reflectRay, depth + 1, maxDepth)) / 2.0;
+        Point thisIntersectpoint;
+        Ray reflectRay(intersectpoint , ray.D - 2 * (ray.D.dot(min_hit.N) * min_hit.N));
+        Color lightCol = recursiveReflection(reflectRay, depth + 1, maxDepth, shadows, thisIntersectpoint);
+        Light reflLight(thisIntersectpoint, lightCol);
+        lights.push_back(&reflLight);
+        Color resCol = totalColor(ray, min_hit, lights, obj, shadows, false, difftIntensity, specIntensity);;
+        lights.pop_back();
+        return resCol;
     }
 }
 

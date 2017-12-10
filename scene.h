@@ -29,8 +29,8 @@ private:
     std::vector<Object*> objects;
     std::vector<Light*> lights;
     Triple eye;
-    Color recursiveReflection(Ray ray, unsigned int depth, unsigned int maxDepth);
-    Color totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights, Object *obj, bool shadows, bool reflection);
+    Color recursiveReflection(Ray ray, unsigned int depth, unsigned int maxDepth, bool shadows, Point &intersectpoint);
+    Color totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights, Object *obj, bool shadows, bool reflection, float &difftIntensity, float &specIntensity);
     void phong(Point hit, Point lightPosition, Vector N, Vector V, Material *mat, float &difftIntensity, float &specIntensity);
 
 public:
