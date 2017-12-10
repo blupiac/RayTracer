@@ -59,17 +59,6 @@ Color Scene::totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights,
     Vector N = min_hit.N;                          //the normal at hit point
     Vector V = -ray.D;                             //the view vector
 
-
-    // https://math.stackexchange.com/questions/13261/how-to-get-a-reflection-vector
-    if(reflection)
-    {
-        Point thisIntersectpoint;
-        Ray reflectRay(hit , ray.D - 2 * (ray.D.dot(min_hit.N) * min_hit.N));
-        Color lightCol = recursiveReflection(reflectRay, 1, 2, shadows, thisIntersectpoint);
-        Light reflLight(thisIntersectpoint, lightCol);
-        //lights.push_back(&reflLight);
-    }
-
     Vector intensity = Vector(0 , 0 , 0);
 
     for (std::vector<Light*>::iterator it = lights.begin() ; it != lights.end(); ++it)
@@ -78,7 +67,20 @@ Color Scene::totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights,
 
         phong(hit, light->position, N, V, material, difftIntensity, specIntensity);
 
-        Triple lightIntensity = light->color * (difftIntensity + specIntensity);
+        Triple lightIntensity;
+
+        // https://math.stackexchange.com/questions/13261/how-to-get-a-reflection-vector
+        if(reflection)
+        {
+            Point thisIntersectpoint;
+            Ray reflectRay(hit , ray.D - 2 * (ray.D.dot(min_hit.N) * min_hit.N));
+            Color specCol = recursiveReflection(reflectRay, 1, 2, shadows, thisIntersectpoint);
+            lightIntensity = light->color * difftIntensity + specCol * specIntensity;
+        }
+        else
+        {
+            lightIntensity = light->color * (difftIntensity + specIntensity);
+        }
 
         if(shadows)
         {
