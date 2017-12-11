@@ -70,13 +70,3 @@ Objects:
     kd: 0.8
     ks: 0.5
     n: 32
-- type: triangle
-  a: [200, 200, 200]
-  b: [250, 200, 300]
-  c: [200, 250, 200]
-  material: # orange
-    color: [1.0,0.5,0.0]
-    ka: 0.2
-    kd: 0.8
-    ks: 0.5
-    n: 32
