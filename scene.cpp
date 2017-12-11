@@ -18,7 +18,7 @@
 #include "scene.h"
 #include "material.h"
 
-Color Scene::trace(const Ray &ray, unsigned int mode, bool shadows, bool reflection)
+Color Scene::trace(const Ray &ray, unsigned int mode, bool shadows, bool reflection, unsigned int depth, unsigned int maxDepth)
 {
     // Find hit object and distance
     Hit min_hit(std::numeric_limits<double>::infinity(),Vector());
@@ -46,10 +46,23 @@ Color Scene::trace(const Ray &ray, unsigned int mode, bool shadows, bool reflect
         return Vector((min_hit.N.x+1)/2, (min_hit.N.y+1)/2, (min_hit.N.z+1)/2);
     }
 
-    return totalColor(ray, min_hit, lights, obj->material, shadows, reflection, true);
+    if(reflection && (depth < maxDepth))
+    {
+        Vector reflDir = ray.D - 2 * (ray.D.dot(min_hit.N) * min_hit.N);
+        Ray reflectRay(ray.at(min_hit.t) + reflDir * 0.1, reflDir);
+        
+        Color reflCol = trace(reflectRay, mode, shadows, reflection, depth + 1, maxDepth);
+
+        Color normalCol = totalColor(ray, min_hit, lights, obj->material, shadows, false);
+        return normalCol + reflCol * obj->material->ks;
+    }
+    else
+    {
+        return totalColor(ray, min_hit, lights, obj->material, shadows, reflection);
+    }
 }
 
-Color Scene::totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights, Material *material, bool shadows, bool reflection, bool withDiff)
+Color Scene::totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights, Material *material, bool shadows, bool reflection)
 {
 
     Point hit = ray.at(min_hit.t);                 //the hit point
@@ -67,26 +80,7 @@ Color Scene::totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights,
 
         Triple lightIntensity;
 
-        // https://math.stackexchange.com/questions/13261/how-to-get-a-reflection-vector
-        if(reflection)
-        {
-            Vector reflDir = ray.D - 2 * (ray.D.dot(min_hit.N) * min_hit.N);
-            Ray reflectRay(hit + reflDir * 0.1, reflDir);
-            
-            Light reflLight = recursiveReflection(reflectRay, 1, 2, shadows);
-            std::vector<Light*> reflLights;
-            reflLights.push_back(&reflLight);
-
-            Color resCol = totalColor(ray, min_hit, reflLights, material, shadows, false, false);
-            lightIntensity = light->color * (difftIntensity + specIntensity) + resCol;
-        }
-        else
-        {
-            if(withDiff)
-                lightIntensity = light->color * (difftIntensity + specIntensity);
-            else
-                lightIntensity = light->color * specIntensity;
-        }
+        lightIntensity = light->color * (difftIntensity + specIntensity);
 
         if(shadows)
         {
@@ -139,44 +133,6 @@ void Scene::phong(Point hit, Point lightPosition, Vector N, Vector V, Material *
     if(specIntensity < 0)  specIntensity = 0;
 }
 
-Light Scene::recursiveReflection(Ray ray, unsigned int depth, unsigned int maxDepth, bool shadows)
-{
-    // Find hit object and distance
-    Hit min_hit(std::numeric_limits<double>::infinity(),Vector());
-    Object *obj = NULL;
-    for (unsigned int i = 0; i < objects.size(); ++i) {
-        Hit hit(objects[i]->intersect(ray));
-        if (hit.t<min_hit.t) {
-            min_hit = hit;
-            obj = objects[i];
-        }
-    }
-
-    // No hit? Return background color.
-    if (!obj) return Light(Point(0.0, 0.0, 0.0), Color(0.0, 0.0, 0.0));
-
-    Point intersectpoint = ray.at(min_hit.t);
-
-    if(depth == maxDepth)
-    {
-        Color col = totalColor(ray, min_hit, lights, obj->material, shadows, false, true);
-        return Light(intersectpoint, col);
-    }
-    else
-    {
-        // https://math.stackexchange.com/questions/13261/how-to-get-a-reflection-vector        
-        Vector reflDir = ray.D - 2 * (ray.D.dot(min_hit.N) * min_hit.N);
-        Ray reflectRay(intersectpoint + reflDir * 0.1 , reflDir);
-        
-        Light reflLight = recursiveReflection(reflectRay, depth + 1, maxDepth, shadows);
-        std::vector<Light*> reflLights;
-        reflLights.push_back(&reflLight);
-        
-        Color resCol = totalColor(ray, min_hit, reflLights, obj->material, shadows, false, false);
-        return Light(intersectpoint, resCol);
-    }
-}
-
 void Scene::render(Image &img, bool shadows, bool reflection)
 {
     int w = img.width();
@@ -185,7 +141,7 @@ void Scene::render(Image &img, bool shadows, bool reflection)
         for (int x = 0; x < w; x++) {
             Point pixel(x+0.5, h-1-y+0.5, 0);
             Ray ray(eye, (pixel-eye).normalized());
-            Color col = trace(ray, 0, shadows, reflection);
+            Color col = trace(ray, 0, shadows, reflection, 0, 2);
             col.clamp();
             img(x,y) = col;
         }
@@ -200,7 +156,7 @@ void Scene::renderZBuffer(Image &img, bool shadows)
         for (int x = 0; x < w; x++) {
             Point pixel(x+0.5, h-1-y+0.5, 0);
             Ray ray(eye, (pixel-eye).normalized());
-            Color col = trace(ray, 1, shadows, false);
+            Color col = trace(ray, 1, shadows, false, 0, 0);
             col.clamp();
             img(x,y) = col;
         }
@@ -215,7 +171,7 @@ void Scene::renderNBuffer(Image &img, bool shadows)
         for (int x = 0; x < w; x++) {
             Point pixel(x+0.5, h-1-y+0.5, 0);
             Ray ray(eye, (pixel-eye).normalized());
-            Color col = trace(ray, 2, shadows, false);
+            Color col = trace(ray, 2, shadows, false, 0, 0);
             col.clamp();
             img(x,y) = col;
         }
