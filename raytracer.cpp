@@ -129,6 +129,7 @@ bool Raytracer::readScene(const std::string& inputFilename)
             parser.GetNextDocument(doc);
 
             doc["RenderMode"] >> mode;
+            doc["AA"] >> aaFactor;
             if(doc["Shadows"] == "true")    shadows = true;
             else                            shadows = false;
 
@@ -182,15 +183,15 @@ void Raytracer::renderToFile(const std::string& outputFilename)
     cout << "Tracing..." << endl;
     if(mode == "phong")
     {
-    	scene->render(img, shadows, reflections);
+    	scene->render(img, shadows, reflections, 0, aaFactor);
     }
     else if(mode == "zbuffer")
     {
-    	scene->renderZBuffer(img, shadows);
+    	scene->render(img, shadows, false, 1, 1);
     }
     else if(mode == "normal")
     {
-    	scene->renderNBuffer(img, shadows);
+    	scene->render(img, shadows, false, 2, 1);
     }
     cout << "Writing image to " << outputFilename << "..." << endl;
     img.write_png(outputFilename.c_str());

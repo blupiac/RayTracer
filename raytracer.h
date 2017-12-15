@@ -27,6 +27,7 @@ private:
     Scene *scene;
     std::string mode;
     bool shadows, reflections;
+    float aaFactor;
 
     // Couple of private functions for parsing YAML nodes
     Material* parseMaterial(const YAML::Node& node);

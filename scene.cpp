@@ -133,47 +133,25 @@ void Scene::phong(Point hit, Point lightPosition, Vector N, Vector V, Material *
     if(specIntensity < 0)  specIntensity = 0;
 }
 
-void Scene::render(Image &img, bool shadows, bool reflection)
+void Scene::render(Image &img, bool shadows, bool reflection, unsigned int renderType, unsigned int aaFactor)
 {
     int w = img.width();
     int h = img.height();
     for (int y = 0; y < h; y++) {
         for (int x = 0; x < w; x++) {
-            Point pixel(x+0.5, h-1-y+0.5, 0);
-            Ray ray(eye, (pixel-eye).normalized());
-            Color col = trace(ray, 0, shadows, reflection, 0, 2);
-            col.clamp();
-            img(x,y) = col;
-        }
-    }
-}
-
-void Scene::renderZBuffer(Image &img, bool shadows)
-{
-    int w = img.width();
-    int h = img.height();
-    for (int y = 0; y < h; y++) {
-        for (int x = 0; x < w; x++) {
-            Point pixel(x+0.5, h-1-y+0.5, 0);
-            Ray ray(eye, (pixel-eye).normalized());
-            Color col = trace(ray, 1, shadows, false, 0, 0);
-            col.clamp();
-            img(x,y) = col;
-        }
-    }
-}
-
-void Scene::renderNBuffer(Image &img, bool shadows)
-{
-    int w = img.width();
-    int h = img.height();
-    for (int y = 0; y < h; y++) {
-        for (int x = 0; x < w; x++) {
-            Point pixel(x+0.5, h-1-y+0.5, 0);
-            Ray ray(eye, (pixel-eye).normalized());
-            Color col = trace(ray, 2, shadows, false, 0, 0);
-            col.clamp();
-            img(x,y) = col;
+            Color totalCol(0.0, 0.0, 0.0);
+            for(unsigned int i = 1; i < (aaFactor + 1); i++)
+            {
+                for(unsigned int j = 1; j < (aaFactor + 1); j++)
+                {
+                    Point pixel(x+(i / (float) (aaFactor + 1.0)) , h-1-y+(j / (float) (aaFactor + 1.0)), 0);
+                    Ray ray(eye, (pixel-eye).normalized());
+                    Color col = trace(ray, renderType, shadows, reflection, 0, 2);
+                    col.clamp();
+                    totalCol += col;
+                }
+            }
+            img(x,y) = totalCol / (float) (aaFactor * aaFactor);
         }
     }
 }

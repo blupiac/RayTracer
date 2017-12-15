@@ -35,7 +35,7 @@ private:
 
 public:
     Color trace(const Ray &ray, unsigned int mode, bool shadows, bool reflection, unsigned int depth, unsigned int maxDepth);
-    void render(Image &img, bool shadows, bool reflection);
+    void render(Image &img, bool shadows, bool reflection, unsigned int renderType, unsigned int aaFactor);
     void renderZBuffer(Image &img, bool shadows);
     void renderNBuffer(Image &img, bool shadows);
     void addObject(Object *o);

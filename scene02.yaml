@@ -1,7 +1,10 @@
 ---
 #  scene02
 
-RenderMode: "normal"
+RenderMode: phong
+Shadows: true
+Reflections: true
+AA: 2
 
 Eye: [200,200,1000]  
 

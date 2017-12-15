@@ -5,6 +5,6 @@ https://tobias.isenberg.cc/graphics/
 
 https://github.com/blupiac/RayTracer
 
-Lab 2: Normal buffer & z-buffer & additional geometry
+Lab 3: Optical laws
 
 By: Bernard Lupiac (1 person group)
