@@ -133,10 +133,12 @@ void Scene::phong(Point hit, Point lightPosition, Vector N, Vector V, Material *
     if(specIntensity < 0)  specIntensity = 0;
 }
 
-void Scene::render(Image &img, bool shadows, bool reflection, unsigned int renderType, unsigned int aaFactor)
+void Scene::render(Image &img, Camera *cam, bool shadows, bool reflection, unsigned int renderType, unsigned int aaFactor)
 {
-    int w = img.width();
-    int h = img.height();
+    int w = cam->xSize;
+    int h = cam->ySize;
+    float startX = cam->center.x - w / 2.0;
+    float startY = cam->center.y - h / 2.0;
     for (int y = 0; y < h; y++) {
         for (int x = 0; x < w; x++) {
             Color totalCol(0.0, 0.0, 0.0);
@@ -144,8 +146,8 @@ void Scene::render(Image &img, bool shadows, bool reflection, unsigned int rende
             {
                 for(unsigned int j = 1; j < (aaFactor + 1); j++)
                 {
-                    Point pixel(x+(i / (float) (aaFactor + 1.0)) , h-1-y+(j / (float) (aaFactor + 1.0)), 0);
-                    Ray ray(eye, (pixel-eye).normalized());
+                    Point pixel(startX + x+(i / (float) (aaFactor + 1.0)), startY + h-1-y+(j / (float) (aaFactor + 1.0)), 0);
+                    Ray ray(cam->eye, (pixel-cam->eye).normalized());
                     Color col = trace(ray, renderType, shadows, reflection, 0, 2);
                     col.clamp();
                     totalCol += col;
@@ -169,9 +171,4 @@ void Scene::addLight(Light *l)
 void Scene::setEye(Triple e)
 {
     eye = e;
-}
-
-void Scene::setCamera(Camera* cam)
-{
-    camera = cam;
 }

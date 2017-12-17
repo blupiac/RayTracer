@@ -30,20 +30,18 @@ private:
     std::vector<Object*> objects;
     std::vector<Light*> lights;
     Triple eye;
-    Camera* camera;
     Light recursiveReflection(Ray ray, unsigned int depth, unsigned int maxDepth, bool shadows);
     Color totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights, Material *material, bool shadows, bool reflection);
     void phong(Point hit, Point lightPosition, Vector N, Vector V, Material *mat, float &difftIntensity, float &specIntensity);
 
 public:
     Color trace(const Ray &ray, unsigned int mode, bool shadows, bool reflection, unsigned int depth, unsigned int maxDepth);
-    void render(Image &img, bool shadows, bool reflection, unsigned int renderType, unsigned int aaFactor);
+    void render(Image &img, Camera *cam, bool shadows, bool reflection, unsigned int renderType, unsigned int aaFactor);
     void renderZBuffer(Image &img, bool shadows);
     void renderNBuffer(Image &img, bool shadows);
     void addObject(Object *o);
     void addLight(Light *l);
     void setEye(Triple e);
-    void setCamera(Camera* cam);
     unsigned int getNumObjects() { return objects.size(); }
     unsigned int getNumLights() { return lights.size(); }
 };

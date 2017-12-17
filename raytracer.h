@@ -29,6 +29,7 @@ private:
     std::string mode;
     bool shadows, reflections;
     float aaFactor;
+    Camera* camera;
 
     // Couple of private functions for parsing YAML nodes
     Material* parseMaterial(const YAML::Node& node);
