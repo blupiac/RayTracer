@@ -197,7 +197,7 @@ bool Raytracer::readScene(const std::string& inputFilename)
 
 void Raytracer::renderToFile(const std::string& outputFilename)
 {
-    Image img(camera->xSize,camera->ySize);
+    Image img(camera->xSize, camera->ySize);
     cout << "Tracing..." << endl;
     if(mode == "phong")
     {

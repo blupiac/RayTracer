@@ -15,12 +15,12 @@
 RenderMode: phong
 Shadows: true
 Reflections: true
-AA: 2
+AA: 1
 
 Camera:
     eye: [200,200,1000]
     center: [200,200,0]
-    up: [0,0.75,0]
+    up: [0.0,0.75,0]
     viewSize: [800,400]
 
 Lights:
