@@ -170,3 +170,8 @@ void Scene::setEye(Triple e)
 {
     eye = e;
 }
+
+void Scene::setCamera(Camera* cam)
+{
+    camera = cam;
+}

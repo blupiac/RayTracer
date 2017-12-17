@@ -19,6 +19,7 @@
 #include "plane.h"
 #include "material.h"
 #include "light.h"
+#include "camera.h"
 #include "image.h"
 #include "yaml/yaml.h"
 #include <ctype.h>
@@ -107,6 +108,21 @@ Light* Raytracer::parseLight(const YAML::Node& node)
     return new Light(position,color);
 }
 
+Camera* Raytracer::parseCamera(const YAML::Node& node)
+{
+    Triple eye, center, up;
+    unsigned int xSize, ySize;
+    eye = parseTriple(node["eye"]);
+    center = parseTriple(node["center"]);
+    up = parseTriple(node["up"]);
+
+    const YAML::Node& viewSizeNode = node["viewSize"];
+    xSize = viewSizeNode[0];
+    ySize = viewSizeNode[1];
+
+    return new Camera(eye, center, up, xSize, ySize);
+}
+
 /*
 * Read a scene from file
 */
@@ -137,7 +153,9 @@ bool Raytracer::readScene(const std::string& inputFilename)
             else                                reflections = false;
 
             // Read scene configuration options
-            scene->setEye(parseTriple(doc["Eye"]));
+            const YAML::Node& cam = doc["Camera"];
+            scene->setEye(parseTriple(cam["eye"]));
+            scene->setCamera(parseCamera(cam));
 
             // Read and parse the scene objects
             const YAML::Node& sceneObjects = doc["Objects"];

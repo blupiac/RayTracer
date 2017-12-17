@@ -22,6 +22,7 @@
 #include "light.h"
 #include "object.h"
 #include "image.h"
+#include "camera.h"
 
 class Scene
 {
@@ -29,6 +30,7 @@ private:
     std::vector<Object*> objects;
     std::vector<Light*> lights;
     Triple eye;
+    Camera* camera;
     Light recursiveReflection(Ray ray, unsigned int depth, unsigned int maxDepth, bool shadows);
     Color totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights, Material *material, bool shadows, bool reflection);
     void phong(Point hit, Point lightPosition, Vector N, Vector V, Material *mat, float &difftIntensity, float &specIntensity);
@@ -41,6 +43,7 @@ public:
     void addObject(Object *o);
     void addLight(Light *l);
     void setEye(Triple e);
+    void setCamera(Camera* cam);
     unsigned int getNumObjects() { return objects.size(); }
     unsigned int getNumLights() { return lights.size(); }
 };

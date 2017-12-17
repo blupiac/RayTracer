@@ -19,6 +19,7 @@
 #include <string>
 #include "triple.h"
 #include "light.h"
+#include "camera.h"
 #include "scene.h"
 #include "yaml/yaml.h"
 
@@ -33,6 +34,7 @@ private:
     Material* parseMaterial(const YAML::Node& node);
     Object* parseObject(const YAML::Node& node);
     Light* parseLight(const YAML::Node& node);
+    Camera* parseCamera(const YAML::Node& node);
 
 public:
     Raytracer() { }

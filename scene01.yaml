@@ -17,7 +17,11 @@ Shadows: true
 Reflections: true
 AA: 2
 
-Eye: [200,200,1000]  
+Camera:
+    eye: [200,200,1000]
+    center: [200,200,0]
+    up: [0,0.75,0]
+    viewSize: [800,400] 
 
 Lights:
 - position: [-200,600,1500]
