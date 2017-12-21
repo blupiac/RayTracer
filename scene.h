@@ -18,6 +18,7 @@
 #define SCENE_H_KNBLQLP6
 
 #include <vector>
+#include <math.h>
 #include "triple.h"
 #include "light.h"
 #include "object.h"
@@ -33,6 +34,7 @@ private:
     Light recursiveReflection(Ray ray, unsigned int depth, unsigned int maxDepth, bool shadows);
     Color totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights, Material *material, bool shadows, bool reflection);
     void phong(Point hit, Point lightPosition, Vector N, Vector V, Material *mat, float &difftIntensity, float &specIntensity);
+    Color getTexColor(const Image *tex, Vector N);
 
 public:
     Color trace(const Ray &ray, unsigned int mode, bool shadows, bool reflection, unsigned int depth, unsigned int maxDepth);

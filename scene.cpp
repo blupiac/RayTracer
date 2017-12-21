@@ -106,7 +106,18 @@ Color Scene::totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights,
         intensity += lightIntensity;
     }
     
-    Color color = material->color * intensity;
+    Color color;
+
+    if(material->texture == NULL)
+    {
+        color = material->color * intensity;
+    }
+    else
+    {
+        Image* tex = material->texture;
+        color = getTexColor(tex, N) * intensity;
+    }
+    
 
     return color;
 }
@@ -163,6 +174,14 @@ void Scene::render(Image &img, Camera *cam, bool shadows, bool reflection, unsig
             img(x,y) = totalCol / (float) (aaFactor * aaFactor);
         }
     }
+}
+
+Color Scene::getTexColor(const Image *tex, Vector N)
+{
+    float u = 0.5 + atan2(N.z, N.x) / (2 * M_PI);
+    float v = 0.5 - asin(N.y) / M_PI;
+
+    return tex->colorAt(u, v);
 }
 
 void Scene::addObject(Object *o)

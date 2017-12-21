@@ -55,8 +55,14 @@ Material* Raytracer::parseMaterial(const YAML::Node& node)
     {
         std::string texturePath;
         node["texture"] >> texturePath;
-        m->texture = Image(texturePath.c_str());
+        Image* tex = new Image(texturePath.c_str());
 
+        if(tex->width() == 0 && tex->height() == 0)
+        {
+            std::cerr << "Error reading texture " << texturePath << " : width and height equals 0." << std::endl;
+        }
+
+        m->texture = tex;
     }
     else
     {
