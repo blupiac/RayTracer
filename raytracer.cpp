@@ -81,11 +81,6 @@ Object* Raytracer::parseObject(const YAML::Node& node)
     std::string objectType;
     node["type"] >> objectType;
 
-    if (node.FindValue("angle"))
-    {
-            node["angle"] >> angle;
-    }
-
     if (objectType == "sphere") {
         Point pos;
         node["position"] >> pos;
@@ -116,6 +111,12 @@ Object* Raytracer::parseObject(const YAML::Node& node)
     if (returnObject) {
         // read the material and attach to object
         returnObject->material = parseMaterial(node["material"]);
+    }
+
+    if (node.FindValue("angle"))
+    {
+        node["angle"] >> returnObject->angle;
+        returnObject->angle = returnObject->angle * 2 * M_PI / 360.0;
     }
 
     return returnObject;

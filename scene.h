@@ -32,9 +32,9 @@ private:
     std::vector<Light*> lights;
     Triple eye;
     Light recursiveReflection(Ray ray, unsigned int depth, unsigned int maxDepth, bool shadows);
-    Color totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights, Material *material, bool shadows, bool reflection);
+    Color totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights, float angle, Material *material, bool shadows, bool reflection);
     void phong(Point hit, Point lightPosition, Vector N, Vector V, Material *mat, float &difftIntensity, float &specIntensity);
-    Color getTexColor(const Image *tex, Vector N);
+    Color getTexColor(const Image *tex, Vector N, float angle);
 
 public:
     Color trace(const Ray &ray, unsigned int mode, bool shadows, bool reflection, unsigned int depth, unsigned int maxDepth);

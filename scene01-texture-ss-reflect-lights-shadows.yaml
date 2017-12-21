@@ -60,7 +60,7 @@ Objects:
 - type: sphere
   position: [140,220,400]
   radius: 50
-  angle: 90
+  angle: 3500
   material:
     texture: textures/earth1k.png
     ka: 0.2

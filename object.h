@@ -25,6 +25,7 @@ class Material;
 class Object {
 public:
     Material *material;
+    float angle;
 
     virtual ~Object() { }
 

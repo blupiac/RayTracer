@@ -53,16 +53,16 @@ Color Scene::trace(const Ray &ray, unsigned int mode, bool shadows, bool reflect
         
         Color reflCol = trace(reflectRay, mode, shadows, reflection, depth + 1, maxDepth);
 
-        Color normalCol = totalColor(ray, min_hit, lights, obj->material, shadows, false);
+        Color normalCol = totalColor(ray, min_hit, lights, obj->angle, obj->material, shadows, false);
         return normalCol + reflCol * obj->material->ks;
     }
     else
     {
-        return totalColor(ray, min_hit, lights, obj->material, shadows, reflection);
+        return totalColor(ray, min_hit, lights, obj->angle, obj->material, shadows, reflection);
     }
 }
 
-Color Scene::totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights, Material *material, bool shadows, bool reflection)
+Color Scene::totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights, float angle, Material *material, bool shadows, bool reflection)
 {
 
     Point hit = ray.at(min_hit.t);                 //the hit point
@@ -115,7 +115,7 @@ Color Scene::totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights,
     else
     {
         Image* tex = material->texture;
-        color = getTexColor(tex, N) * intensity;
+        color = getTexColor(tex, N, angle) * intensity;
     }
     
 
@@ -176,9 +176,9 @@ void Scene::render(Image &img, Camera *cam, bool shadows, bool reflection, unsig
     }
 }
 
-Color Scene::getTexColor(const Image *tex, Vector N)
+Color Scene::getTexColor(const Image *tex, Vector N, float angle)
 {
-    float u = 1 - (0.5 + (atan2(N.z, N.x) ) / (2 * M_PI));
+    float u = 1 - (0.5 + (atan2(N.z, N.x) + angle) / (2 * M_PI));
     float v = 0.5 - asin(N.y) / M_PI;
 
     return tex->colorAt(u, v);
