@@ -178,7 +178,7 @@ void Scene::render(Image &img, Camera *cam, bool shadows, bool reflection, unsig
 
 Color Scene::getTexColor(const Image *tex, Vector N)
 {
-    float u = 0.5 + atan2(N.z, N.x) / (2 * M_PI);
+    float u = 1 - (0.5 + (atan2(N.z, N.x) ) / (2 * M_PI));
     float v = 0.5 - asin(N.y) / M_PI;
 
     return tex->colorAt(u, v);
