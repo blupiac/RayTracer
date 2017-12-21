@@ -17,11 +17,13 @@
 
 #include <iostream>
 #include "triple.h"
+#include "image.h"
 
 class Material
 {
 public:
     Color color;        // base color
+    Image texture;
     double ka;          // ambient intensity
     double kd;          // diffuse intensity
     double ks;          // specular intensity 

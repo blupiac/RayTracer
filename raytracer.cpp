@@ -50,7 +50,18 @@ Triple parseTriple(const YAML::Node& node)
 Material* Raytracer::parseMaterial(const YAML::Node& node)
 {
     Material *m = new Material();
-    node["color"] >> m->color;	
+
+    if (node.FindValue("texture"))
+    {
+        std::string texturePath;
+        node["texture"] >> texturePath;
+        m->texture = Image(texturePath.c_str());
+
+    }
+    else
+    {
+        node["color"] >> m->color;  
+    }
     node["ka"] >> m->ka;
     node["kd"] >> m->kd;
     node["ks"] >> m->ks;
@@ -63,6 +74,11 @@ Object* Raytracer::parseObject(const YAML::Node& node)
     Object *returnObject = NULL;
     std::string objectType;
     node["type"] >> objectType;
+
+    if (node.FindValue("angle"))
+    {
+            node["angle"] >> angle;
+    }
 
     if (objectType == "sphere") {
         Point pos;

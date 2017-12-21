@@ -28,7 +28,7 @@ private:
     Scene *scene;
     std::string mode;
     bool shadows, reflections;
-    float aaFactor;
+    float aaFactor, angle;
     Camera* camera;
 
     // Couple of private functions for parsing YAML nodes
