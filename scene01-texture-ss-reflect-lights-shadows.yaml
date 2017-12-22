@@ -62,7 +62,7 @@ Objects:
   radius: 50
   angle: 3500
   material:
-    texture: ../textures/earth1k.png
+    texture: textures/earth1k.png
     ka: 0.2
     kd: 0.8
     ks: 0

@@ -17,6 +17,7 @@
 #include "sphere.h"
 #include "triangle.h"
 #include "plane.h"
+#include "quad.h"
 #include "material.h"
 #include "light.h"
 #include "camera.h"
