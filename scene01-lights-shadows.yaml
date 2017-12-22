@@ -92,5 +92,5 @@ Objects:
     color: [0.0,1.0,0.0]
     ka: 0.2
     kd: 0.8
-    ks: 0
+    ks: 0.0
     n: 1

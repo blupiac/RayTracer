@@ -28,9 +28,16 @@ Hit Quad::intersect(const Ray &ray)
     Triangle t1(a, b, c);
     Triangle t2(a, c, d);
 
-    Vector e1 = b - d;
-    Vector e2 = a - c;
-    Vector n = e1.cross(e2);
+    Vector e1 = b - a;
+    Vector e2 = d - a;
+    Vector n1 = e1.cross(e2);
+
+    e1 = b - c;
+    e2 = d - c;
+    Vector n2 = e1.cross(e2);
+
+    Vector n = n1 + n2 / 2.0;
+    n = n.normalized();
 
     const Hit h1 = t1.intersect(ray);
     const Hit h2 = t2.intersect(ray);
