@@ -30,15 +30,15 @@ public:
     Mesh(std::string meshPath);
 
     virtual Hit intersect(const Ray &ray);
+    void scaleTranslate();
 
     std::vector<Point> m_positions;
     std::vector<Vector> m_normals;
     std::vector<MeshTriangle> m_triangles;
-    Triple position;
+    Point position;
     float size;
 
 private:
-	void centerAndScaleToUnit ();
 	void recomputeNormals ();
 };
 

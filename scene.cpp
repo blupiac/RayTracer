@@ -173,6 +173,9 @@ void Scene::phong(Point hit, Point lightPosition, Vector N, Vector V, Material *
 
 void Scene::render(Image &img, Camera *cam, bool shadows, bool reflection, unsigned int renderType, unsigned int aaFactor, GoochParams gp)
 {
+    std::clock_t tInit = std::clock();
+    std::cout << "Rendering begins." << std::endl;
+
     int w = img.width();
     int h = img.height();
     float pixSize = cam->up.length();
@@ -201,6 +204,8 @@ void Scene::render(Image &img, Camera *cam, bool shadows, bool reflection, unsig
             img(x,y) = totalCol / (float) (aaFactor * aaFactor);
         }
     }
+
+    std::cout << "Rendering ended: " << (std::clock() - tInit) / (double)CLOCKS_PER_SEC << " seconds" << std::endl;
 }
 
 Color Scene::getTexColor(const Image *tex, Vector N, float angle)

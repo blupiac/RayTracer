@@ -48,7 +48,6 @@ Mesh::Mesh(std::string meshPath)
 
     std::cout << "Read: " << meshPath << " Points read: " << sizeV << " Triangles read: " << sizeT << std::endl;
 
-    //centerAndScaleToUnit ();
     recomputeNormals ();
 }
 
@@ -57,9 +56,9 @@ Hit Mesh::intersect(const Ray &ray)
     for (unsigned int i = 0 ; i < m_triangles.size(); ++i)
     {
 
-        Triangle t(m_positions[m_triangles[i][0]] * size + position,
-                    m_positions[m_triangles[i][1]] * size + position,
-                    m_positions[m_triangles[i][2]] * size + position);
+        Triangle t(m_positions[m_triangles[i][0]],
+                    m_positions[m_triangles[i][1]],
+                    m_positions[m_triangles[i][2]]);
 
         const Hit h = t.intersect(ray);
 
@@ -78,21 +77,6 @@ Hit Mesh::intersect(const Ray &ray)
 
 // -------------- Helpers -------------------
 
-void Mesh::centerAndScaleToUnit () {
-    Vector c;
-    for  (unsigned int i = 0; i < m_positions.size (); i++)
-        c += m_positions[i];
-    c /= m_positions.size ();
-    float maxD = (m_positions[0] - c).length();
-    for (unsigned int i = 0; i < m_positions.size (); i++){
-        float m = (m_positions[i] - c).length();
-        if (m > maxD)
-            maxD = m;
-    }
-    for  (unsigned int i = 0; i < m_positions.size (); i++)
-        m_positions[i] = (m_positions[i] - c) / maxD;
-}
-
 void Mesh::recomputeNormals () {
     m_normals.clear ();
     m_normals.resize (m_positions.size (), Vector (0.f, 0.f, 0.f));
@@ -110,4 +94,13 @@ void Mesh::recomputeNormals () {
     }
     for (unsigned int i = 0; i < m_normals.size (); i++)
         m_normals[i].normalize ();
+}
+
+void Mesh::scaleTranslate()
+{
+    for (unsigned int i = 0; i < m_positions.size(); i++)
+    {
+        m_positions[i] *= size;
+        m_positions[i] += position;
+    }
 }
