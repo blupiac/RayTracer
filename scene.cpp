@@ -71,6 +71,11 @@ Color Scene::totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights,
 
     Vector intensity = Vector(0 , 0 , 0);
 
+    if(mode == 3 && N.dot(V) < 0.2)
+    {
+        return Color(0.0, 0.0, 0.0);
+    }
+
     for (std::vector<Light*>::iterator it = lights.begin() ; it != lights.end(); ++it)
     {
         Light* light = *it;
