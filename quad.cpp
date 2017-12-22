@@ -28,16 +28,20 @@ Hit Quad::intersect(const Ray &ray)
     Triangle t1(a, b, c);
     Triangle t2(a, c, d);
 
+    Vector e1 = b - d;
+    Vector e2 = a - c;
+    Vector n = e1.cross(e2);
+
     const Hit h1 = t1.intersect(ray);
     const Hit h2 = t2.intersect(ray);
 
     if(!h1.no_hit)
     {
-        return h1;
+        return Hit(h1.t, n);
     }
     else if(!h2.no_hit)
     {
-        return h2;
+        return Hit(h2.t, n);
     }
     else
     { 

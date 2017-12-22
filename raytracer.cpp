@@ -108,6 +108,16 @@ Object* Raytracer::parseObject(const YAML::Node& node)
         Plane *plane = new Plane(d, n);
         returnObject = plane;
     }
+    else if(objectType == "quad")
+    {
+        Point a, b, c, d;
+        a = parseTriple(node["a"]);
+        b = parseTriple(node["b"]);
+        c = parseTriple(node["c"]);
+        d = parseTriple(node["d"]);
+        Quad *quad = new Quad(a, b, c, d);
+        returnObject = quad;
+    }
 
     if (returnObject) {
         // read the material and attach to object
