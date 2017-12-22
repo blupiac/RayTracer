@@ -84,3 +84,13 @@ Objects:
     kd: 0.8
     ks: 0
     n: 1
+- type: mesh
+  path: meshs/tweety.off
+  position: [200,200,500]
+  size: 100
+  material: # grey
+    color: [0.0,1.0,0.0]
+    ka: 0.2
+    kd: 0.8
+    ks: 0
+    n: 1

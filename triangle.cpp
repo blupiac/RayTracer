@@ -19,7 +19,7 @@
 #include <iostream>
 #include <math.h>
 
-/************************** Sphere **********************************/
+/************************** Triangle **********************************/
 
 Hit Triangle::intersect(const Ray &ray)
 {

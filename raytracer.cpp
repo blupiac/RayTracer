@@ -18,6 +18,7 @@
 #include "triangle.h"
 #include "plane.h"
 #include "quad.h"
+#include "mesh.h"
 #include "material.h"
 #include "light.h"
 #include "camera.h"
@@ -117,6 +118,15 @@ Object* Raytracer::parseObject(const YAML::Node& node)
         d = parseTriple(node["d"]);
         Quad *quad = new Quad(a, b, c, d);
         returnObject = quad;
+    }
+    else if(objectType == "mesh")
+    {
+        std::string meshPath;
+        node["path"] >> meshPath;
+        Mesh *mesh = new Mesh(meshPath);
+        mesh->position = parseTriple(node["position"]);
+        node["size"] >> mesh->size;
+        returnObject = mesh;
     }
 
     if (returnObject) {

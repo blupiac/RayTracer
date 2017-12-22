@@ -131,7 +131,6 @@ public:
         return *this;
     }
 
-
     double dot(const Triple &t) const
     {
         return x*t.x + y*t.y + z*t.z;
