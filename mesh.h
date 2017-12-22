@@ -31,15 +31,13 @@ public:
 
     virtual Hit intersect(const Ray &ray);
     void scaleTranslate();
+    void recomputeNormals ();
 
     std::vector<Point> m_positions;
     std::vector<Vector> m_normals;
     std::vector<MeshTriangle> m_triangles;
     Point position;
     float size;
-
-private:
-	void recomputeNormals ();
 };
 
 #endif /* end of include guard: MESH_H */

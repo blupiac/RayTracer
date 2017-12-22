@@ -126,6 +126,8 @@ Object* Raytracer::parseObject(const YAML::Node& node)
         Mesh *mesh = new Mesh(meshPath);
         mesh->position = parseTriple(node["position"]);
         node["size"] >> mesh->size;
+        //mesh->recomputeNormals();
+        mesh->scaleTranslate();
         returnObject = mesh;
     }
 

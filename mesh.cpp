@@ -64,12 +64,7 @@ Hit Mesh::intersect(const Ray &ray)
 
         if(!h.no_hit)
         {
-            Vector n = m_normals[m_triangles[i][0]] +
-                        m_normals[m_triangles[i][1]] + 
-                        m_normals[m_triangles[i][2]];
-            n /= 3.0;
-            n = n.normalized();
-            return Hit(h.t, n);
+            return Hit(h.t, m_normals[i]);
         }
     }
     return Hit::NO_HIT();
@@ -79,7 +74,9 @@ Hit Mesh::intersect(const Ray &ray)
 
 void Mesh::recomputeNormals () {
     m_normals.clear ();
-    m_normals.resize (m_positions.size (), Vector (0.f, 0.f, 0.f));
+    std::vector<Vector> m_normalsPerPoint;
+    m_normalsPerPoint.resize (m_positions.size (), Vector (0.f, 0.f, 0.f));
+    m_normals.resize (m_triangles.size (), Vector (0.f, 0.f, 0.f));
     for (unsigned int i = 0; i < m_triangles.size (); i++) {
         Vector e01 = m_positions[m_triangles[i][1]] -  m_positions[m_triangles[i][0]];
         Vector e02 = m_positions[m_triangles[i][2]] -  m_positions[m_triangles[i][0]];
@@ -89,11 +86,21 @@ void Mesh::recomputeNormals () {
         for (unsigned int j = 0; j < 3; j++)
         {
             // avec poids
-            m_normals[m_triangles[i][j]] += n * std::asin(cross.length());
+            m_normalsPerPoint[m_triangles[i][j]] += n * std::asin(cross.length());
         }
     }
+    for (unsigned int i = 0; i < m_normalsPerPoint.size (); i++)
+        m_normalsPerPoint[i].normalize ();
+
     for (unsigned int i = 0; i < m_normals.size (); i++)
-        m_normals[i].normalize ();
+    {
+        m_normals[i] = m_normalsPerPoint[m_triangles[i][0]] +
+                        m_normalsPerPoint[m_triangles[i][1]] + 
+                        m_normalsPerPoint[m_triangles[i][2]];
+        m_normals[i] /= 3.0;
+        m_normals[i] = m_normals[i].normalized();
+    }
+
 }
 
 void Mesh::scaleTranslate()
