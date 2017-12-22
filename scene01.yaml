@@ -20,8 +20,8 @@ AA: 2
 Camera:
     eye: [200,200,1000]
     center: [200,200,0]
-    up: [0.5,1.0,0.0]
-    viewSize: [500,500] 
+    up: [0,1.0,0]
+    viewSize: [400,400]
 
 Lights:
 - position: [-200,600,1500]
@@ -67,16 +67,6 @@ Objects:
 - type: sphere
   position: [110,130,200]
   radius: 50
-  material: # orange
-    color: [1.0,0.5,0.0]
-    ka: 0.2
-    kd: 0.8
-    ks: 0.5
-    n: 32
-- type: triangle
-  a: [200, 200, 200]
-  b: [250, 200, 300]
-  c: [200, 250, 200]
   material: # orange
     color: [1.0,0.5,0.0]
     ka: 0.2
