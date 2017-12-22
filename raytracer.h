@@ -5,7 +5,8 @@
 //  Created for the Computer Science course "Introduction Computer Graphics"
 //  taught at the University of Groningen by Tobias Isenberg.
 //
-//  Author: Maarten Everts
+//  Authors: Maarten Everts
+//			 Bernard Lupiac
 //
 //  This framework is inspired by and uses code of the raytracer framework of 
 //  Bert Freudenberg that can be found at
@@ -20,6 +21,7 @@
 #include "triple.h"
 #include "light.h"
 #include "camera.h"
+#include "goochparams.h"
 #include "scene.h"
 #include "yaml/yaml.h"
 
@@ -30,6 +32,7 @@ private:
     bool shadows, reflections;
     float aaFactor, angle;
     Camera* camera;
+    GoochParams gp;
 
     // Couple of private functions for parsing YAML nodes
     Material* parseMaterial(const YAML::Node& node);

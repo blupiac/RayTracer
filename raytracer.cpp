@@ -168,6 +168,15 @@ bool Raytracer::readScene(const std::string& inputFilename)
             parser.GetNextDocument(doc);
 
             doc["RenderMode"] >> mode;
+            if(mode == "gooch")
+            {
+                const YAML::Node& gooch = doc["GoochParameters"];
+                gooch["b"] >> gp.b;
+                gooch["y"] >> gp.y;
+                gooch["alpha"] >> gp.alpha;
+                gooch["beta"] >> gp.beta;
+            }
+
             doc["AA"] >> aaFactor;
             if(doc["Shadows"] == "true")    shadows = true;
             else                            shadows = false;
@@ -224,15 +233,19 @@ void Raytracer::renderToFile(const std::string& outputFilename)
     cout << "Tracing..." << endl;
     if(mode == "phong")
     {
-    	scene->render(img, camera, shadows, reflections, 0, aaFactor);
+    	scene->render(img, camera, shadows, reflections, 0, aaFactor, gp);
     }
     else if(mode == "zbuffer")
     {
-    	scene->render(img, camera, shadows, false, 1, 1);
+    	scene->render(img, camera, shadows, false, 1, 1, gp);
     }
     else if(mode == "normal")
     {
-    	scene->render(img, camera, shadows, false, 2, 1);
+    	scene->render(img, camera, shadows, false, 2, 1, gp);
+    }
+    else if(mode == "gooch")
+    {
+        scene->render(img, camera, shadows, reflections, 3, aaFactor, gp);
     }
     cout << "Writing image to " << outputFilename << "..." << endl;
     img.write_png(outputFilename.c_str());

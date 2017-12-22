@@ -16,9 +16,8 @@
 //
 
 #include "scene.h"
-#include "material.h"
 
-Color Scene::trace(const Ray &ray, unsigned int mode, bool shadows, bool reflection, unsigned int depth, unsigned int maxDepth)
+Color Scene::trace(const Ray &ray, unsigned int mode, bool shadows, bool reflection, unsigned int depth, unsigned int maxDepth, GoochParams gp)
 {
     // Find hit object and distance
     Hit min_hit(std::numeric_limits<double>::infinity(),Vector());
@@ -51,18 +50,19 @@ Color Scene::trace(const Ray &ray, unsigned int mode, bool shadows, bool reflect
         Vector reflDir = ray.D - 2 * (ray.D.dot(min_hit.N) * min_hit.N);
         Ray reflectRay(ray.at(min_hit.t) + reflDir * 0.1, reflDir);
         
-        Color reflCol = trace(reflectRay, mode, shadows, reflection, depth + 1, maxDepth);
+        Color reflCol = trace(reflectRay, mode, shadows, reflection, depth + 1, maxDepth, gp);
 
-        Color normalCol = totalColor(ray, min_hit, lights, obj->angle, obj->material, shadows, false);
+        Color normalCol = totalColor(ray, min_hit, lights, obj->angle, obj->material, shadows, false, mode, gp);
         return normalCol + reflCol * obj->material->ks;
     }
     else
     {
-        return totalColor(ray, min_hit, lights, obj->angle, obj->material, shadows, reflection);
+        return totalColor(ray, min_hit, lights, obj->angle, obj->material, shadows, reflection, mode, gp);
     }
+
 }
 
-Color Scene::totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights, float angle, Material *material, bool shadows, bool reflection)
+Color Scene::totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights, float angle, Material *material, bool shadows, bool reflection, unsigned int mode, GoochParams gp)
 {
 
     Point hit = ray.at(min_hit.t);                 //the hit point
@@ -75,12 +75,31 @@ Color Scene::totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights,
     {
         Light* light = *it;
 
+        Triple lightIntensity;
+
         float difftIntensity, specIntensity;
         phong(hit, light->position, N, V, material, difftIntensity, specIntensity);
 
-        Triple lightIntensity;
+        if(mode == 0) // phong
+        {
+            lightIntensity = light->color * (difftIntensity + specIntensity);
+        }
+        if(mode == 3) // gooch
+        {
+            Vector L = light->position - hit;
+            L = L.normalized();
+            Triple kd = light->color * material->color * material->kd;
 
-        lightIntensity = light->color * (difftIntensity + specIntensity);
+            Triple kBlue = Triple(0, 0, gp.b);
+            Triple kYellow = Triple(gp.y, gp.y, 0);
+
+            Triple kCool = kBlue + gp.alpha * kd;
+            Triple kWarm = kYellow + gp.beta * kd;
+
+            lightIntensity = kCool * (1 - N.dot(L)) / 2.0 + kWarm * (1 + N.dot(L)) / 2.0;
+            lightIntensity += specIntensity;
+        }
+        
 
         if(shadows)
         {
@@ -108,16 +127,19 @@ Color Scene::totalColor(const Ray &ray, Hit min_hit, std::vector<Light*> lights,
     
     Color color;
 
-    if(material->texture == NULL)
-    {
-        color = material->color * intensity;
-    }
-    else
+    if(material->texture != NULL)
     {
         Image* tex = material->texture;
         color = getTexColor(tex, N, angle) * intensity;
     }
-    
+    else if(mode == 0)
+    {
+        color = material->color * intensity;
+    }
+    else if(mode == 3)
+    {
+        color = intensity;
+    }
 
     return color;
 }
@@ -144,7 +166,7 @@ void Scene::phong(Point hit, Point lightPosition, Vector N, Vector V, Material *
     if(specIntensity < 0)  specIntensity = 0;
 }
 
-void Scene::render(Image &img, Camera *cam, bool shadows, bool reflection, unsigned int renderType, unsigned int aaFactor)
+void Scene::render(Image &img, Camera *cam, bool shadows, bool reflection, unsigned int renderType, unsigned int aaFactor, GoochParams gp)
 {
     int w = img.width();
     int h = img.height();
@@ -166,7 +188,7 @@ void Scene::render(Image &img, Camera *cam, bool shadows, bool reflection, unsig
                     float aaY = j * (xDir.y + yDir.y) / (float) (aaFactor + 1.0);
                     Point pixel = start + pixSize * ((x + aaX) * xDir + (h - y + aaY) * yDir);
                     Ray ray(cam->eye, (pixel-cam->eye).normalized());
-                    Color col = trace(ray, renderType, shadows, reflection, 0, 2);
+                    Color col = trace(ray, renderType, shadows, reflection, 0, 2, gp);
                     col.clamp();
                     totalCol += col;
                 }
